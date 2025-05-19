@@ -9,8 +9,8 @@ import { Chat } from './chat.entity';
 
 @Entity()
 export class Message {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Chat, (chat) => chat.messages, { onDelete: 'CASCADE' })
   chat: Chat;
@@ -19,7 +19,7 @@ export class Message {
   content: string;
 
   @Column()
-  role: 'user' | 'assistant'; // quem enviou
+  role: 'user' | 'assistant';
 
   @CreateDateColumn()
   createdAt: Date;

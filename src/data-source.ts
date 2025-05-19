@@ -1,8 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { User } from './entities/user.entity';
-import { Chat } from './entities/chat.entity';
-import { Message } from './entities/message.entity';
+// import { SnakeNamingStrategy } from './snake-naming.strategy';
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -11,7 +9,8 @@ export const AppDataSource = new DataSource({
   username: 'root',
   password: '',
   database: 'chat_app',
-  entities: [User, Chat, Message],
+  synchronize: true,
   migrations: ['src/migrations/*.ts'],
-  synchronize: false,
+  entities: ['src/**/*.entity.ts'],
+  // namingStrategy: new SnakeNamingStrategy(),
 });

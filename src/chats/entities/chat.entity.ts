@@ -1,25 +1,32 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   ManyToOne,
   OneToMany,
   CreateDateColumn,
+  UpdateDateColumn,
+  Column,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../users/entities/user.entity';
 import { Message } from './message.entity';
 
 @Entity()
 export class Chat {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  title: string;
 
   @ManyToOne(() => User, (user) => user.chats, { onDelete: 'CASCADE' })
   user: User;
 
-  @OneToMany(() => Message, (message) => message.chat)
+  @OneToMany(() => Message, (message) => message.chat, { cascade: true })
   messages: Message[];
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

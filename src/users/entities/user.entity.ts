@@ -1,13 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Chat } from './chat.entity';
+import { Chat } from '../../chats/entities/chat.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  name: string;
+
   @Column({ unique: true })
-  username: string;
+  email: string;
 
   @Column()
   password: string;
