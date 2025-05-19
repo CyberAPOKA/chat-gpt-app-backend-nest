@@ -34,39 +34,65 @@ export class ChatsService {
 
     chat.updatedAt = new Date();
 
+    await this.saveUserMessage(chat, prompt);
+    await this.generateAssistantResponse(chat, prompt);
+
+    await this.chatRepo.update(chat.id, { updatedAt: new Date() });
+
+    return chat;
+  }
+
+  private async saveUserMessage(chat: Chat, content: string) {
     const userMsg = this.messageRepo.create({
       chat,
       role: 'user',
-      content: prompt,
+      content,
     });
-
     await this.messageRepo.save(userMsg);
+  }
+
+  private async generateAssistantResponse(chat: Chat, prompt: string) {
+    // const useOpenAI = this.configService.get<boolean>('USE_OPENAI');
+    const useOpenAI = false;
+    if (!useOpenAI) {
+      const assistantMsg = this.messageRepo.create({
+        chat,
+        role: 'assistant',
+        content:
+          'Olá! Esta é uma resposta simulada do ChatGPT para desenvolvimento.',
+      });
+      await this.messageRepo.save(assistantMsg);
+      return;
+    }
+
+    const response = await this.openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+    });
 
     const assistantMsg = this.messageRepo.create({
       chat,
       role: 'assistant',
-      content:
-        'Olá! Esta é uma resposta simulada do ChatGPT para desenvolvimento.',
+      content: response.choices[0].message.content || '[Resposta vazia]',
+    });
+    await this.messageRepo.save(assistantMsg);
+  }
+
+  async addMessageToChat(chatId: string, userId: number, prompt: string) {
+    const chat = await this.chatRepo.findOne({
+      where: { id: chatId, user: { id: userId } },
     });
 
-    await this.messageRepo.save(assistantMsg);
+    if (!chat) throw new NotFoundException('Chat não encontrado');
+
+    chat.updatedAt = new Date();
+
+    await this.saveUserMessage(chat, prompt);
+    await this.generateAssistantResponse(chat, prompt);
 
     await this.chatRepo.update(chat.id, { updatedAt: new Date() });
 
-    // const response = await this.openai.chat.completions.create({
-    //   model: 'gpt-3.5-turbo',
-    //   messages: [{ role: 'user', content: prompt }],
-    // });
-
-    // const assistantMsg = this.messageRepo.create({
-    //   chat,
-    //   role: 'assistant',
-    //   content: response.choices[0].message.content || '[Resposta vazia]',
-    // });
-
-    // await this.messageRepo.save(assistantMsg);
-
-    return chat;
+    return { success: true };
   }
 
   async getChatsByUser(userId: number, limit = 20, search?: string) {
@@ -112,48 +138,6 @@ export class ChatsService {
       title: chat.title,
       messages: sorted,
     };
-  }
-
-  async addMessageToChat(chatId: string, userId: number, prompt: string) {
-    const chat = await this.chatRepo.findOne({
-      where: { id: chatId, user: { id: userId } },
-    });
-
-    if (!chat) throw new NotFoundException('Chat não encontrado');
-
-    chat.updatedAt = new Date();
-
-    const userMsg = this.messageRepo.create({
-      chat,
-      role: 'user',
-      content: prompt,
-    });
-
-    await this.messageRepo.save(userMsg);
-
-    const assistantMsg = this.messageRepo.create({
-      chat,
-      role: 'assistant',
-      content: 'Olá! Meu nome é christian',
-    });
-
-    await this.messageRepo.save(assistantMsg);
-
-    await this.chatRepo.update(chat.id, { updatedAt: new Date() });
-
-    // const response = await this.openai.chat.completions.create({
-    //   model: 'gpt-3.5-turbo',
-    //   messages: [{ role: 'user', content: prompt }],
-    // });
-
-    // const assistantMsg = this.messageRepo.create({
-    //   chat,
-    //   role: 'assistant',
-    //   content: response.choices[0].message.content || '[Resposta vazia]',
-    // });
-    // await this.messageRepo.save(assistantMsg);
-
-    return { success: true };
   }
 
   async updateTitle(chatId: string, userId: number, newTitle: string) {

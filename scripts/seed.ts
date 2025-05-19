@@ -30,7 +30,9 @@ async function seed() {
     password: passwordHash,
   });
 
-  for (let i = 1; i <= 200; i++) {
+  const NUMBER_OF_CHATS = 1;
+
+  for (let i = 1; i <= NUMBER_OF_CHATS; i++) {
     const chat = await chatRepo.save({
       title: `Chat de teste #${i}`,
       user,
@@ -38,12 +40,18 @@ async function seed() {
 
     const messages: Partial<Message>[] = [];
 
-    for (let j = 1; j <= 10000; j++) {
+    const baseDate = new Date();
+
+    const NUMBER_OF_MESSAGES_PER_CHAT = 50;
+
+    for (let j = 1; j <= NUMBER_OF_MESSAGES_PER_CHAT; j++) {
       const role = j % 2 === 0 ? 'assistant' : 'user';
+
       messages.push({
         chat,
         role,
         content: `Mensagem ${j} do ${role}`,
+        createdAt: new Date(baseDate.getTime() + j * 10000),
       });
     }
 
