@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitSchema1747699944677 implements MigrationInterface {
-    name = 'InitSchema1747699944677'
+export class InitSchema1747700661854 implements MigrationInterface {
+    name = 'InitSchema1747700661854'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE \`message\` DROP FOREIGN KEY \`FK_619bc7b78eba833d2044153bacc\``);

@@ -32,6 +32,25 @@ const mockMessageRepo = () => ({
   })),
 });
 
+jest.mock('openai', () => {
+  return {
+    default: jest.fn().mockImplementation(() => ({
+      chat: {
+        completions: {
+          create: jest.fn().mockResolvedValue({
+            choices: [{ message: { content: 'Resposta simulada do ChatGPT' } }],
+            usage: {
+              prompt_tokens: 10,
+              completion_tokens: 20,
+              total_tokens: 30,
+            },
+          }),
+        },
+      },
+    })),
+  };
+});
+
 describe('ChatsService', () => {
   let service: ChatsService;
   let chatRepo: ReturnType<typeof mockChatRepo>;
