@@ -53,7 +53,7 @@ export class ChatsService {
 
   private async generateAssistantResponse(chat: Chat, prompt: string) {
     // const useOpenAI = this.configService.get<boolean>('USE_OPENAI');
-    const useOpenAI = false;
+    const useOpenAI = true;
     if (!useOpenAI) {
       const assistantMsg = this.messageRepo.create({
         chat,
@@ -66,9 +66,14 @@ export class ChatsService {
     }
 
     const response = await this.openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-16k',
       messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1000,
     });
+
+    console.log('Resposta bruta:', response.choices[0].message.content);
+
+    console.log('Tokens usados:', response.usage);
 
     const assistantMsg = this.messageRepo.create({
       chat,

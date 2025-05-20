@@ -15,7 +15,7 @@ export class Message {
   @ManyToOne(() => Chat, (chat) => chat.messages, { onDelete: 'CASCADE' })
   chat: Chat;
 
-  @Column()
+  @Column({ type: 'longtext' })
   content: string;
 
   @Column()
